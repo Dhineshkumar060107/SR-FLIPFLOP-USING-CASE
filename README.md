@@ -49,35 +49,52 @@ Developed by:Dhineshkumar.L
 RegisterNumber:24900785
 
 ```
-module srflipflop(s, r, clk, rst, q, qbar); 
-    input s; 
-    input r; 
-    input clk; 
-    input rst; 
-    output q; 
-    output qbar; 
-  reg q,qbar; 
-  always @ (posedge(clk) or posedge(rst)) begin 
-  if(rst==1'b1) begin 
-  q= 1'b0;qbar= 1'b1;
-  nd 
-  else if(s==1'b0 && r==1'b0) 
-   begin 
-  q=q; qbar=qbar; 
-  end 
-   else if(s==1'b0 && r==1'b1) 
-    begin 
-  q= 1'b0; qbar= 1'b1; 
-  end 
-    else if(s==1'b1 && r==1'b0) 
-    begin 
-  q= 1'b1; qbar= 1'b0; 
-  end 
-  else  
-  begin 
-  q=1'bx;qbar=1'bx; 
-  end 
-  end 
+always @(posedge clk) begin
+    case ({S, R})
+        2'b00: begin
+            Q <= Q;
+            Qn <= Qn;
+        end
+        2'b01: begin
+            Q <= 0;
+            Qn <= 1;
+        end
+        2'b10: begin
+            Q <= 1;
+            Qn <= 0;
+        end
+        2'b11: begin
+            Q <= 1'bx;
+            Qn <= 1'bx;
+        end
+    endcase
+end
+endmodule
+
+module SR_FlipFlop_tb; reg S; reg R; reg clk; wire Q; wire Qn;
+
+SR_FlipFlop uut (
+    .S(S),
+    .R(R),
+    .clk(clk),
+    .Q(Q),
+    .Qn(Qn)
+);
+
+initial begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+
+initial begin
+    $monitor("Time=%0t | S=%b, R=%b, Q=%b, Qn=%b", $time, S, R, Q, Qn);
+
+    S = 0; R = 0; #10;
+    S = 0; R = 1; #10;
+    S = 1; R = 0; #10;
+    S = 1; R = 1; #10;
+
+    $finish;
 endmodule
 ```
 **RTL LOGIC FOR FLIPFLOPS**
